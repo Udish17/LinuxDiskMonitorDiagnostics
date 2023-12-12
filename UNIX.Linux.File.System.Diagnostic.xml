@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?><ManagementPack ContentReadable="true" SchemaVersion="2.0" OriginalSchemaVersion="1.1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <Manifest>
+    <Identity>
+      <ID>UNIXLinux.File.System.Diagnostic</ID>
+      <Version>1.0.0.15</Version>
+    </Identity>
+    <Name>UNIX/Linux File System Diagnostic</Name>
+    <References>
+      <Reference Alias="SystemCenter">
+        <ID>Microsoft.SystemCenter.Library</ID>
+        <Version>7.0.8448.6</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="Unix">
+        <ID>Microsoft.Unix.Library</ID>
+        <Version>10.19.1158.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="RHEL7">
+        <ID>Microsoft.Linux.RHEL.7</ID>
+        <Version>10.19.1226.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>	  
+	  <Reference Alias="Universal">
+        <ID>Microsoft.Linux.Universal.Library</ID>
+        <Version>10.19.1158.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+	  <Reference Alias="UniversalM">
+        <ID>Microsoft.Linux.Universal.Monitoring</ID>
+        <Version>10.19.1158.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="UnixShell">
+        <ID>Microsoft.Unix.ShellCommand.Library</ID>
+        <Version>10.19.1158.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>	 
+    </References>
+  </Manifest>
+  <Monitoring>
+    <Diagnostics>
+      <Diagnostic ID="Microsoft.Addendum.Linux.RHEL.7.Logical.Disk.Free.Space.File.Usage.Diagnostic" Accessibility="Public" Enabled="true" Target="RHEL7!Microsoft.Linux.RHEL.7.LogicalDisk" Monitor="RHEL7!Microsoft.Linux.RHEL.7.LogicalDisk.PercentFreeSpace.Monitor" ExecuteOnState="Error" Remotable="true" Timeout="300">
+        <Category>Maintenance</Category>        		  
+        <ProbeAction ID="ExecuteCommand" TypeID="Unix!Microsoft.Unix.WSMan.Invoke.ProbeAction">
+          <TargetSystem>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</TargetSystem>
+          <Uri>http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/SCX_OperatingSystem?__cimnamespace=root/scx</Uri>
+          <Selector />
+          <InvokeAction>ExecuteCommand</InvokeAction>
+          <Input>&lt;p:ExecuteCommand_INPUT xmlns:p="http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/SCX_OperatingSystem"&gt;&lt;p:command&gt;/bin/sh -c "df -h $Target/Property[Type="Unix!Microsoft.Unix.LogicalDevice"]/DeviceID$"&lt;/p:command&gt;&lt;p:timeout&gt;60&lt;/p:timeout&gt;&lt;/p:ExecuteCommand_INPUT&gt;</Input>
+        </ProbeAction>		  
+      </Diagnostic>
+	  <Diagnostic ID="Microsoft.Addendum.Linux.RHEL.7.Logical.Disk.Free.Space.Omi.Usage.Diagnostic" Accessibility="Public" Enabled="true" Target="RHEL7!Microsoft.Linux.RHEL.7.LogicalDisk" Monitor="RHEL7!Microsoft.Linux.RHEL.7.LogicalDisk.PercentFreeSpace.Monitor" ExecuteOnState="Error" Remotable="true" Timeout="300">
+        <Category>Maintenance</Category>        		  
+        <ProbeAction ID="ExecuteCommand" TypeID="Unix!Microsoft.Unix.WSMan.Invoke.ProbeAction">
+          <TargetSystem>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</TargetSystem>
+          <Uri>http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/SCX_OperatingSystem?__cimnamespace=root/scx</Uri>
+          <Selector />
+          <InvokeAction>ExecuteCommand</InvokeAction>
+          <Input>&lt;p:ExecuteCommand_INPUT xmlns:p="http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/SCX_OperatingSystem"&gt;&lt;p:command&gt;/opt/omi/bin/omicli gi root/scx { SCX_FileSystemStatisticalInformation Name $Target/Property[Type="Unix!Microsoft.Unix.LogicalDevice"]/DeviceID$ }&lt;/p:command&gt;&lt;p:timeout&gt;60&lt;/p:timeout&gt;&lt;/p:ExecuteCommand_INPUT&gt;</Input>
+        </ProbeAction>		  
+      </Diagnostic>
+	  <Diagnostic ID="Microsoft.Addendum.Linux.RHEL.7.Logical.Disk.Free.Space.Largest.File.Diagnostic" Accessibility="Public" Enabled="true" Target="RHEL7!Microsoft.Linux.RHEL.7.LogicalDisk" Monitor="RHEL7!Microsoft.Linux.RHEL.7.LogicalDisk.PercentFreeSpace.Monitor" ExecuteOnState="Error" Remotable="true" Timeout="300">
+        <Category>Maintenance</Category>
+        <ProbeAction ID="Execute" TypeID="Unix!Microsoft.Unix.WSMan.Invoke.VarPriv.ProbeAction">
+          <TargetSystem>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</TargetSystem>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.PrivilegedAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.PrivilegedAccount"]/Password$</Password>
+          <Uri>http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/SCX_OperatingSystem?__cimnamespace=root/scx</Uri>
+          <Selector />
+          <InvokeAction>ExecuteShellCommand</InvokeAction>
+          <Input>&lt;p:ExecuteCommand_INPUT xmlns:p="http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/SCX_OperatingSystem"&gt;&lt;p:command&gt;find $Target/Property[Type="Unix!Microsoft.Unix.LogicalDevice"]/DeviceID$ -type f -exec du -Sh {} + | sort -rh 2> /dev/null | head -n 5&lt;/p:command&gt;&lt;p:timeout&gt;60&lt;/p:timeout&gt;&lt;/p:ExecuteCommand_INPUT&gt;</Input>
+          <TimeOutInMS>12000</TimeOutInMS>
+        </ProbeAction>	  
+      </Diagnostic>
+	   <Diagnostic ID="Microsoft.Addendum.Linux.Universal.Logical.Disk.Free.Space.File.Usage.Diagnostic" Accessibility="Public" Enabled="true" Target="Universal!Microsoft.Linux.Universal.LogicalDisk" Monitor="UniversalM!Microsoft.Linux.Universal.LogicalDisk.PercentFreeSpace.Monitor" ExecuteOnState="Error" Remotable="true" Timeout="300">
+        <Category>Maintenance</Category>        		  
+        <ProbeAction ID="ExecuteCommand" TypeID="Unix!Microsoft.Unix.WSMan.Invoke.ProbeAction">
+          <TargetSystem>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</TargetSystem>
+          <Uri>http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/SCX_OperatingSystem?__cimnamespace=root/scx</Uri>
+          <Selector />
+          <InvokeAction>ExecuteCommand</InvokeAction>
+          <Input>&lt;p:ExecuteCommand_INPUT xmlns:p="http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/SCX_OperatingSystem"&gt;&lt;p:command&gt;/bin/sh -c "df -h $Target/Property[Type="Unix!Microsoft.Unix.LogicalDevice"]/DeviceID$"&lt;/p:command&gt;&lt;p:timeout&gt;60&lt;/p:timeout&gt;&lt;/p:ExecuteCommand_INPUT&gt;</Input>
+        </ProbeAction>		  
+      </Diagnostic>
+	  <Diagnostic ID="Microsoft.Addendum.Linux.Universal.Logical.Disk.Free.Space.Omi.Usage.Diagnostic" Accessibility="Public" Enabled="true" Target="Universal!Microsoft.Linux.Universal.LogicalDisk" Monitor="UniversalM!Microsoft.Linux.Universal.LogicalDisk.PercentFreeSpace.Monitor" ExecuteOnState="Error" Remotable="true" Timeout="300">
+        <Category>Maintenance</Category>        		  
+        <ProbeAction ID="ExecuteCommand" TypeID="Unix!Microsoft.Unix.WSMan.Invoke.ProbeAction">
+          <TargetSystem>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</TargetSystem>
+          <Uri>http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/SCX_OperatingSystem?__cimnamespace=root/scx</Uri>
+          <Selector />
+          <InvokeAction>ExecuteCommand</InvokeAction>
+          <Input>&lt;p:ExecuteCommand_INPUT xmlns:p="http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/SCX_OperatingSystem"&gt;&lt;p:command&gt;/opt/omi/bin/omicli gi root/scx { SCX_FileSystemStatisticalInformation Name $Target/Property[Type="Unix!Microsoft.Unix.LogicalDevice"]/DeviceID$ }&lt;/p:command&gt;&lt;p:timeout&gt;60&lt;/p:timeout&gt;&lt;/p:ExecuteCommand_INPUT&gt;</Input>
+        </ProbeAction>		  
+      </Diagnostic>
+	  <Diagnostic ID="Microsoft.Addendum.Linux.Universal.Logical.Disk.Free.Space.Largest.File.Diagnostic" Accessibility="Public" Enabled="true" Target="Universal!Microsoft.Linux.Universal.LogicalDisk" Monitor="UniversalM!Microsoft.Linux.Universal.LogicalDisk.PercentFreeSpace.Monitor" ExecuteOnState="Error" Remotable="true" Timeout="300">
+        <Category>Maintenance</Category>
+        <ProbeAction ID="Execute" TypeID="Unix!Microsoft.Unix.WSMan.Invoke.VarPriv.ProbeAction">
+          <TargetSystem>$Target/Host/Property[Type="Unix!Microsoft.Unix.Computer"]/PrincipalName$</TargetSystem>
+          <UserName>$RunAs[Name="Unix!Microsoft.Unix.PrivilegedAccount"]/UserName$</UserName>
+          <Password>$RunAs[Name="Unix!Microsoft.Unix.PrivilegedAccount"]/Password$</Password>
+          <Uri>http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/SCX_OperatingSystem?__cimnamespace=root/scx</Uri>
+          <Selector />
+          <InvokeAction>ExecuteShellCommand</InvokeAction>
+          <Input>&lt;p:ExecuteCommand_INPUT xmlns:p="http://schemas.microsoft.com/wbem/wscim/1/cim-schema/2/SCX_OperatingSystem"&gt;&lt;p:command&gt;find $Target/Property[Type="Unix!Microsoft.Unix.LogicalDevice"]/DeviceID$ -type f -exec du -Sh {} + | sort -rh 2> /dev/null | head -n 5&lt;/p:command&gt;&lt;p:timeout&gt;60&lt;/p:timeout&gt;&lt;/p:ExecuteCommand_INPUT&gt;</Input>
+          <TimeOutInMS>12000</TimeOutInMS>
+        </ProbeAction>	  
+      </Diagnostic>
+	</Diagnostics>
+  </Monitoring>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="false">
+      <DisplayStrings>
+        <DisplayString ElementID="UNIXLinux.File.System.Diagnostic">
+          <Name>UNIX/Linux File System Diagnostic</Name>
+          <Description>Diagnostic MP to get more details about the disk usage.</Description>
+        </DisplayString>       
+        <DisplayString ElementID="Microsoft.Addendum.Linux.RHEL.7.Logical.Disk.Free.Space.File.Usage.Diagnostic">
+          <Name>Disk System Details</Name>
+          <Description />
+        </DisplayString>
+		<DisplayString ElementID="Microsoft.Addendum.Linux.RHEL.7.Logical.Disk.Free.Space.Omi.Usage.Diagnostic">
+          <Name>OMI CLI File System Details</Name>
+          <Description />
+        </DisplayString>
+		<DisplayString ElementID="Microsoft.Addendum.Linux.RHEL.7.Logical.Disk.Free.Space.Largest.File.Diagnostic">
+          <Name>Largest File Details</Name>
+          <Description />
+        </DisplayString>
+		<DisplayString ElementID="Microsoft.Addendum.Linux.Universal.Logical.Disk.Free.Space.File.Usage.Diagnostic">
+          <Name>Disk System Details</Name>
+          <Description />
+        </DisplayString>
+		<DisplayString ElementID="Microsoft.Addendum.Linux.Universal.Logical.Disk.Free.Space.Omi.Usage.Diagnostic">
+          <Name>OMI CLI File System Details</Name>
+          <Description />
+        </DisplayString>
+		<DisplayString ElementID="Microsoft.Addendum.Linux.Universal.Logical.Disk.Free.Space.Largest.File.Diagnostic">
+          <Name>Largest File Details</Name>
+          <Description />
+        </DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPack>
