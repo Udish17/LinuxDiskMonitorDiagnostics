@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?><ManagementPack ContentReadable="true" SchemaVersion="2.0" OriginalSchemaVersion="1.1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <Manifest>
     <Identity>
-      <ID>UNIXLinux.File.System.Diagnostic</ID>
-      <Version>1.0.0.15</Version>
+      <ID>UNIX.Linux.File.System.Diagnostic</ID>
+      <Version>1.0.0.16</Version>
     </Identity>
     <Name>UNIX/Linux File System Diagnostic</Name>
     <References>
@@ -111,7 +111,7 @@
   <LanguagePacks>
     <LanguagePack ID="ENU" IsDefault="false">
       <DisplayStrings>
-        <DisplayString ElementID="UNIXLinux.File.System.Diagnostic">
+        <DisplayString ElementID="UNIX.Linux.File.System.Diagnostic">
           <Name>UNIX/Linux File System Diagnostic</Name>
           <Description>Diagnostic MP to get more details about the disk usage.</Description>
         </DisplayString>       
